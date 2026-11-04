@@ -1,0 +1,19 @@
+name: AP Elections API readiness check
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'
+permissions:
+  contents: read
+jobs:
+  ap-readiness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check licensed AP connection (no public export)
+        env:
+          AP_ELECTIONS_API_KEY: ${{ secrets.AP_ELECTIONS_API_KEY }}
+        run: python scripts/ap_elections_adapter.py
