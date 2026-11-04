@@ -30,16 +30,9 @@ function render2026Trackers(counts,available,checked){for(const chamber of ['Hou
 // Safari requires a user gesture before Web Audio can play.
 // The enable button unlocks audio; calls still trigger visual alerts if audio is blocked.
 let electionAudioContext=null;let electionSoundEnabled=false;
-function playElectionChime(){if(!electionSoundEnabled||!electionAudioContext)return;try{
-if(electionAudioContext.state!=='running')return;
-const now=electionAudioContext.currentTime;
-for(const [i,freq] of [523.25,659.25,783.99].entries()){
-const osc=electionAudioContext.createOscillator(),gain=electionAudioContext.createGain();
-osc.type='sine';osc.frequency.value=freq;gain.gain.setValueAtTime(0.0001,now+i*.17);
-gain.gain.exponentialRampToValueAtTime(.14,now+i*.17+.025);
-gain.gain.exponentialRampToValueAtTime(.0001,now+i*.17+.25);
-osc.connect(gain);gain.connect(electionAudioContext.destination);osc.start(now+i*.17);osc.stop(now+i*.17+.27);
-}}catch(e){console.warn('Election chime unavailable',e)}}
+const customCallAudio=new Audio('election_call_7sec.mp3');customCallAudio.preload='auto';
+function playElectionChime(){if(!electionSoundEnabled)return;try{customCallAudio.pause();customCallAudio.currentTime=0;const p=customCallAudio.play();if(p&&p.catch)p.catch(()=>{});}catch(e){console.warn('Custom election alert unavailable',e)}}
+
 async function enableElectionSound(){const b=document.getElementById('enableCallSound');try{
 electionAudioContext=electionAudioContext||new (window.AudioContext||window.webkitAudioContext)();
 await electionAudioContext.resume();electionSoundEnabled=electionAudioContext.state==='running';
